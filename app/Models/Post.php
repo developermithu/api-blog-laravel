@@ -50,7 +50,8 @@ class Post extends Model
      */
     public function scopePublished(Builder $query): Builder
     {
-        return $query->where('status', PostStatus::PUBLISHED);
+        return $query->where('status', PostStatus::PUBLISHED)
+            ->whereNull('deleted_at');
     }
 
     /**
@@ -58,6 +59,7 @@ class Post extends Model
      */
     public function scopeDraft(Builder $query): Builder
     {
-        return $query->where('status', PostStatus::DRAFT);
+        return $query->where('status', PostStatus::DRAFT)
+            ->whereNull('deleted_at');
     }
 }
