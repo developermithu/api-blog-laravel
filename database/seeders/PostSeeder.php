@@ -22,5 +22,12 @@ class PostSeeder extends Seeder
                     ->count(rand(5, 10))
             )
             ->create();
+
+        // Mark the latest post as featured
+        $latestPost = Post::latest()->first();
+
+        if ($latestPost) {
+            $latestPost->update(['is_featured' => true]);
+        }
     }
 }

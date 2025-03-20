@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\PostStatus;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
@@ -25,7 +26,10 @@ class PostFactory extends Factory
             'author_id' => 1,
             'title' => $title,
             'slug' => $slug,
+            'excerpt' => fake()->words(rand(10, 15), true),
             'content' => fake()->paragraph(rand(5, 15)),
+            'status' => fake()->randomElement(PostStatus::cases()),
+            'is_featured' => false,
         ];
     }
 }
