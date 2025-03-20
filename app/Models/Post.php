@@ -62,4 +62,9 @@ class Post extends Model
         return $query->where('status', PostStatus::DRAFT)
             ->whereNull('deleted_at');
     }
+
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
 }
