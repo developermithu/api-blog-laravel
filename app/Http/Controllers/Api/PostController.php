@@ -19,7 +19,7 @@ class PostController extends Controller
         $posts = Post::with(['author', 'category'])
             ->published()
             ->latest()
-            ->paginate(20);
+            ->paginate(6);
 
         return PostResource::collection($posts);
     }
@@ -27,9 +27,14 @@ class PostController extends Controller
     public function store(StorePostRequest $request): PostResource
     {
         $data = $request->validated();
-        auth()->user()->posts()->create($data);
+        $post = auth()->user()->posts()->create($data);
 
-        return new PostResource($data->load(['author', 'category']));
+        if ($request->hasFile('cover_image')) {
+            $post->addMediaFromRequest('cover_image')
+                ->toMediaCollection('images');
+        }
+
+        return new PostResource($post->load(['author', 'category']));
     }
 
     public function show(Post $post): PostResource
@@ -44,11 +49,22 @@ class PostController extends Controller
     public function update(UpdatePostRequest $request, Post $post): PostResource
     {
         $post->update($request->validated());
+
+        if ($request->hasFile('cover_image')) {
+            // Clear existing media in the collection
+            $post->clearMediaCollection('images');
+            
+            // Add new media
+            $post->addMediaFromRequest('cover_image')
+                ->toMediaCollection('images');
+        }
+
         return new PostResource($post->load(['author', 'category']));
     }
 
     public function destroy(Post $post): JsonResponse
     {
+        $post->clearMediaCollection('images');
         $post->delete();
         return response()->json(['message' => 'Post deleted successfully'], 200);
     }

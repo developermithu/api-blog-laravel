@@ -31,6 +31,7 @@ class StorePostRequest extends FormRequest
             'slug' => ['required', 'string', 'max:255', Rule::unique('posts', 'slug')],
             'excerpt' => ['required', 'string', 'max:255'],
             'content' => ['required', 'string'],
+            'cover_image' => ['nullable', 'image', 'mimes:jpeg,png,webp', 'max:2048'],
             'status' => ['sometimes', new Enum(PostStatus::class)],
             'is_featured' => ['sometimes', 'boolean'],
         ];
