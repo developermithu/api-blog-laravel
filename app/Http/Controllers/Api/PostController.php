@@ -11,6 +11,7 @@ use App\Http\Requests\Post\StorePostRequest;
 use App\Http\Requests\Post\UpdatePostRequest;
 use App\Http\Resources\PostResource;
 use App\Models\Post;
+use App\Actions\UploadPostImage;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Pipeline\Pipeline;
@@ -18,6 +19,11 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class PostController extends Controller
 {
+    public function __construct(
+        private readonly UploadPostImage $uploadPostImage
+    ) {
+    }
+
     public function index(): AnonymousResourceCollection
     {
         $posts = Post::query()->with(['author', 'category']);
@@ -41,10 +47,7 @@ class PostController extends Controller
         $data = $request->validated();
         $post = auth()->user()->posts()->create($data);
 
-        if ($request->hasFile('cover_image')) {
-            $post->addMediaFromRequest('cover_image')
-                ->toMediaCollection('images');
-        }
+        $this->uploadPostImage->execute($post, $request->file('cover_image'));
 
         return new PostResource($post->load(['author', 'category']));
     }
@@ -62,14 +65,7 @@ class PostController extends Controller
     {
         $post->update($request->validated());
 
-        if ($request->hasFile('cover_image')) {
-            // Clear existing media in the collection
-            $post->clearMediaCollection('images');
-
-            // Add new media
-            $post->addMediaFromRequest('cover_image')
-                ->toMediaCollection('images');
-        }
+        $this->uploadPostImage->execute($post, $request->file('cover_image'));
 
         return new PostResource($post->load(['author', 'category']));
     }
