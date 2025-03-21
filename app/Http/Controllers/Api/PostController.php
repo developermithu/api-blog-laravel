@@ -16,8 +16,15 @@ class PostController extends Controller
 {
     public function index(): AnonymousResourceCollection
     {
+        $filter = request('filter', 'all');
+        
         $posts = Post::with(['author', 'category'])
-            ->published()
+            ->when($filter === 'trash', function ($query) {
+                $query->onlyTrashed();
+            })
+            ->when($filter === 'all', function ($query) {
+                $query->withoutTrashed();
+            })
             ->latest()
             ->paginate(6);
 
@@ -64,8 +71,23 @@ class PostController extends Controller
 
     public function destroy(Post $post): JsonResponse
     {
-        $post->clearMediaCollection('images');
         $post->delete();
         return response()->json(['message' => 'Post deleted successfully'], 200);
+    }
+
+    public function restore($id): JsonResponse
+    {
+        $post = Post::withTrashed()->findOrFail($id);
+        $post->restore();
+        return response()->json(['message' => 'Post restored successfully']);
+    }
+
+    public function forceDelete($id): JsonResponse
+    {
+        $post = Post::withTrashed()->findOrFail($id);
+        $post->clearMediaCollection('images');
+        $post->forceDelete();
+        
+        return response()->json(['message' => 'Post permanently deleted']);
     }
 }
