@@ -64,7 +64,6 @@ jobs:
             php artisan migrate --force
             php artisan optimize:clear
             php artisan storage:link
-            php artisan optimize
 
       # 8. Set Permissions on Directories
       - name: Set Permissions on Directories
