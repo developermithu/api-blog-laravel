@@ -17,13 +17,25 @@ class PostController extends Controller
     public function index(): AnonymousResourceCollection
     {
         $filter = request('filter', 'all');
-        
+        $status = request('status');
+        $search = trim(request('search'));
+        $validStatuses = [PostStatus::PUBLISHED->value, PostStatus::DRAFT->value];
+
         $posts = Post::with(['author', 'category'])
             ->when($filter === 'trash', function ($query) {
                 $query->onlyTrashed();
             })
             ->when($filter === 'all', function ($query) {
                 $query->withoutTrashed();
+            })
+            ->when(in_array($status, $validStatuses), function ($query) use ($status) {
+                $query->where('status', $status);
+            })
+            ->when($search, function ($query) use ($search) {
+                $query->whereAny(['title', 'slug', 'content'], 'like', "%$search%")
+                    ->orWhereHas('category', function ($query) use ($search) {
+                        $query->whereAny(['name', 'slug'], 'like', "%$search%");
+                    });
             })
             ->latest()
             ->paginate(6);
@@ -60,7 +72,7 @@ class PostController extends Controller
         if ($request->hasFile('cover_image')) {
             // Clear existing media in the collection
             $post->clearMediaCollection('images');
-            
+
             // Add new media
             $post->addMediaFromRequest('cover_image')
                 ->toMediaCollection('images');
@@ -87,7 +99,7 @@ class PostController extends Controller
         $post = Post::withTrashed()->findOrFail($id);
         $post->clearMediaCollection('images');
         $post->forceDelete();
-        
+
         return response()->json(['message' => 'Post permanently deleted']);
     }
 }
