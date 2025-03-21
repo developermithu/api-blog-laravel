@@ -4,6 +4,7 @@ namespace App\Http\Requests\Post;
 
 use App\Enums\PostStatus;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
 
@@ -14,7 +15,7 @@ class StorePostRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return $this->user()->isAdmin();
     }
 
     /**
