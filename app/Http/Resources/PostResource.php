@@ -34,8 +34,8 @@ class PostResource extends JsonResource
                     'slug' => $this->category->slug,
                 ];
             }),
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            'created_at' => $this->created_at->format('M d, Y'),
+            'updated_at' => $this->updated_at->format('M d, Y'),
         ];
     }
 }
