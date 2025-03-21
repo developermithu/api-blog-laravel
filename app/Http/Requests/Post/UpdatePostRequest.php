@@ -32,7 +32,7 @@ class UpdatePostRequest extends FormRequest
                 'required',
                 'string',
                 'max:255',
-                Rule::unique('posts')->ignore($this->post)
+                Rule::unique('posts')->ignore($this->post),
             ],
             'excerpt' => ['required', 'string', 'max:255'],
             'content' => ['required', 'string'],

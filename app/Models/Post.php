@@ -16,7 +16,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 #[ObservedBy(PostObserver::class)]
 class Post extends Model implements HasMedia
 {
-    use HasFactory, SoftDeletes, InteractsWithMedia;
+    use HasFactory, InteractsWithMedia, SoftDeletes;
 
     protected $fillable = [
         'title',

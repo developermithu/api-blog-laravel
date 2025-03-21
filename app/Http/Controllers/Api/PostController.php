@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Actions\UploadPostImage;
 use App\Enums\PostStatus;
 use App\Filters\Posts\SearchFilter;
 use App\Filters\Posts\StatusFilter;
@@ -11,7 +12,6 @@ use App\Http\Requests\Post\StorePostRequest;
 use App\Http\Requests\Post\UpdatePostRequest;
 use App\Http\Resources\PostResource;
 use App\Models\Post;
-use App\Actions\UploadPostImage;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Pipeline\Pipeline;
@@ -21,8 +21,7 @@ class PostController extends Controller
 {
     public function __construct(
         private readonly UploadPostImage $uploadPostImage
-    ) {
-    }
+    ) {}
 
     public function index(): AnonymousResourceCollection
     {
@@ -73,6 +72,7 @@ class PostController extends Controller
     public function destroy(Post $post): JsonResponse
     {
         $post->delete();
+
         return response()->json(['message' => 'Post deleted successfully'], 200);
     }
 
@@ -80,6 +80,7 @@ class PostController extends Controller
     {
         $post = Post::withTrashed()->findOrFail($id);
         $post->restore();
+
         return response()->json(['message' => 'Post restored successfully']);
     }
 

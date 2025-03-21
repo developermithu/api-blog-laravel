@@ -9,7 +9,7 @@ class UploadPostImage
 {
     public function execute(Post $post, ?UploadedFile $image): void
     {
-        if (!$image) {
+        if (! $image) {
             return;
         }
 

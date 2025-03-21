@@ -24,4 +24,3 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('posts/{id}/force-delete', [PostController::class, 'forceDelete'])->name('posts.force-delete');
     });
 });
-
