@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Str;
 
 class PostResource extends JsonResource
 {
@@ -14,6 +15,11 @@ class PostResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        // Calculate reading time based on content length
+        $wordsPerMinute = 200;
+        $wordCount = str_word_count(strip_tags($this->content));
+        $readingTimeInMin = ceil($wordCount / $wordsPerMinute);
+
         return [
             'id' => $this->id,
             'title' => $this->title,
@@ -23,17 +29,9 @@ class PostResource extends JsonResource
             'image_url' => $this->cover_image,
             'status' => $this->status->value,
             'is_featured' => $this->is_featured,
-            'author' => [
-                'id' => $this->author->id,
-                'name' => $this->author->name,
-            ],
-            'category' => $this->when($this->category, function () {
-                return [
-                    'id' => $this->category->id,
-                    'name' => $this->category->name,
-                    'slug' => $this->category->slug,
-                ];
-            }),
+            'author' => new UserResource($this->whenLoaded('author')),
+            'category' => new CategoryResource($this->whenLoaded('category')),
+            'reading_time_in_min' => $readingTimeInMin,
             'created_at' => $this->created_at->format('M d, Y'),
             'updated_at' => $this->updated_at->format('M d, Y'),
         ];

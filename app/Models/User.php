@@ -60,4 +60,9 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(Post::class, 'author_id');
     }
+
+    public function getAvatarUrlAttribute(): string
+    {
+        return 'https://ui-avatars.com/api/?name=' . urlencode($this->name);
+    }
 }
