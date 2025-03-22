@@ -53,7 +53,8 @@ class PostController extends Controller
 
     public function show(Post $post): PostResource
     {
-        if ($post->status !== PostStatus::PUBLISHED) {
+        // Only published posts are visible to public, drafts visible to authors
+        if ($post->status !== PostStatus::PUBLISHED && !auth()->user()?->isAdmin()) {
             throw new NotFoundHttpException('Post not found');
         }
 
