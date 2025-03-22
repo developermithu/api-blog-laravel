@@ -15,6 +15,8 @@ class TrashFilter
             $query->onlyTrashed();
         } elseif ($filter === 'all') {
             $query->withoutTrashed();
+        } elseif ($filter === 'with_trashed') {
+            $query->withTrashed();
         }
 
         return $next($query);
