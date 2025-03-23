@@ -9,7 +9,9 @@ use Illuminate\Support\Facades\Route;
 // Public routes
 Route::get('posts', [PostController::class, 'index']);
 Route::get('posts/{post}', [PostController::class, 'show']);
+
 Route::get('categories', [CategoryController::class, 'index']);
+Route::get('categories/{category}', [CategoryController::class,'show']);
 
 // Authenticated Routes
 Route::middleware('auth:sanctum')->group(function () {
@@ -22,5 +24,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('posts', PostController::class)->except(['index', 'show']);
         Route::post('posts/{id}/restore', [PostController::class, 'restore'])->name('posts.restore');
         Route::delete('posts/{id}/force-delete', [PostController::class, 'forceDelete'])->name('posts.force-delete');
+
+        Route::apiResource('categories', CategoryController::class)->except(['index','show']);
     });
 });
