@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Actions\UploadPostImage;
-use App\Enums\PostStatus;
 use App\Filters\Posts\SearchFilter;
 use App\Filters\Posts\StatusFilter;
 use App\Filters\Posts\TrashFilter;
@@ -15,16 +14,20 @@ use App\Models\Post;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Pipeline\Pipeline;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class PostController extends Controller
 {
+    use AuthorizesRequests;
+
     public function __construct(
         private readonly UploadPostImage $uploadPostImage
     ) {}
 
     public function index(): AnonymousResourceCollection
     {
+        $this->authorize('viewAny', Post::class);
+
         $posts = Post::query()->with(['author', 'category']);
 
         $posts = app(Pipeline::class)
@@ -43,6 +46,8 @@ class PostController extends Controller
 
     public function store(StorePostRequest $request): PostResource
     {
+        $this->authorize('create', Post::class);
+
         $data = $request->validated();
         $post = auth()->user()->posts()->create($data);
 
@@ -53,18 +58,16 @@ class PostController extends Controller
 
     public function show(Post $post): PostResource
     {
-        // Only published posts are visible to public, drafts visible to authors
-        if ($post->status !== PostStatus::PUBLISHED && !auth()->user()?->isAdmin()) {
-            throw new NotFoundHttpException('Post not found');
-        }
+        $this->authorize('view', $post);
 
         return new PostResource($post->load(['author', 'category']));
     }
 
     public function update(UpdatePostRequest $request, Post $post): PostResource
     {
-        $post->update($request->validated());
+        $this->authorize('update', $post);
 
+        $post->update($request->validated());
         $this->uploadPostImage->execute($post, $request->file('cover_image'));
 
         return new PostResource($post->load(['author', 'category']));
@@ -72,25 +75,28 @@ class PostController extends Controller
 
     public function destroy(Post $post): JsonResponse
     {
-        $post->delete();
+        $this->authorize('delete', $post);
 
+        $post->delete();
         return response()->json(['message' => 'Post deleted successfully'], 200);
     }
 
     public function restore($id): JsonResponse
     {
         $post = Post::withTrashed()->findOrFail($id);
-        $post->restore();
+        $this->authorize('restore', $post);
 
+        $post->restore();
         return response()->json(['message' => 'Post restored successfully']);
     }
 
     public function forceDelete($id): JsonResponse
     {
         $post = Post::withTrashed()->findOrFail($id);
+        $this->authorize('forceDelete', $post);
+
         $post->clearMediaCollection('images');
         $post->forceDelete();
-
         return response()->json(['message' => 'Post permanently deleted']);
     }
 }

@@ -27,6 +27,8 @@ class Post extends Model implements HasMedia
         'is_featured',
         'author_id',
         'category_id',
+        'created_at',
+        'updated_at',
     ];
 
     protected function casts(): array

@@ -20,7 +20,8 @@ class PostObserver
      */
     public function updated(Post $post): void
     {
-        //
+        $post->updated_at = now();
+        $post->save();
     }
 
     /**
