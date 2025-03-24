@@ -28,3 +28,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('categories', CategoryController::class)->except(['index','show']);
     });
 });
+
+
+// Auth routes for API
+require __DIR__.'/api_auth.php';
