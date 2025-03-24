@@ -16,12 +16,11 @@ class PostObserver
     }
 
     /**
-     * Handle the Post "updated" event.
+     * Handle the Post "updating" event.
      */
-    public function updated(Post $post): void
+    public function updating(Post $post): void
     {
         $post->updated_at = now();
-        $post->save();
     }
 
     /**
