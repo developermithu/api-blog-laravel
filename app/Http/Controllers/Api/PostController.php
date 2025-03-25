@@ -6,6 +6,7 @@ use App\Actions\UploadPostImage;
 use App\Filters\Posts\SearchFilter;
 use App\Filters\Posts\StatusFilter;
 use App\Filters\Posts\TrashFilter;
+use App\Filters\Posts\FeaturedFilter;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Post\StorePostRequest;
 use App\Http\Requests\Post\UpdatePostRequest;
@@ -36,6 +37,7 @@ class PostController extends Controller
                 TrashFilter::class,
                 StatusFilter::class,
                 SearchFilter::class,
+                FeaturedFilter::class,
             ])
             ->thenReturn()
             ->latest()
