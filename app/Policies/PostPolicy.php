@@ -4,7 +4,6 @@ namespace App\Policies;
 
 use App\Models\Post;
 use App\Models\User;
-use App\Enums\PostStatus;
 
 class PostPolicy
 {
@@ -21,11 +20,7 @@ class PostPolicy
      */
     public function view(?User $user, Post $post): bool
     {
-        if ($post->status === PostStatus::PUBLISHED) {
-            return true;
-        }
-
-        return $user && ($user->isAdmin() || $user->id === $post->author_id);
+        return true;
     }
 
     /**
