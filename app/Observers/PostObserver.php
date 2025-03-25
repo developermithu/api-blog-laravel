@@ -3,6 +3,7 @@
 namespace App\Observers;
 
 use App\Models\Post;
+use App\Enums\PostStatus;
 use Illuminate\Support\Facades\DB;
 
 class PostObserver
@@ -38,6 +39,18 @@ class PostObserver
     }
 
     /**
+     * Handle the Post "deleting" event.
+     * Update status to draft and remove featured flag 
+     */
+    public function deleting(Post $post): void
+    {
+        $post->update([
+            'status' => PostStatus::DRAFT,
+            'is_featured' => false
+        ]);
+    }
+
+    /**
      * Handle the Post "deleted" event.
      */
     public function deleted(Post $post): void
@@ -50,14 +63,17 @@ class PostObserver
      */
     public function restored(Post $post): void
     {
-        //
+        $post->update([
+            'status' => PostStatus::PUBLISHED
+        ]);
     }
 
     /**
      * Handle the Post "force deleted" event.
+     * Clean up any associated media when post is permanently deleted
      */
     public function forceDeleted(Post $post): void
     {
-        //
+        $post->clearMediaCollection('images');
     }
 }

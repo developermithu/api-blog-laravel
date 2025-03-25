@@ -97,7 +97,6 @@ class PostController extends Controller
         $post = Post::withTrashed()->findOrFail($id);
         $this->authorize('forceDelete', $post);
 
-        $post->clearMediaCollection('images');
         $post->forceDelete();
         return response()->json(['message' => 'Post permanently deleted']);
     }
