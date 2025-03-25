@@ -9,7 +9,7 @@ class UploadPostImage
 {
     public function execute(Post $post, ?UploadedFile $image): void
     {
-        if (! $image) {
+        if (!$image) {
             return;
         }
 
@@ -18,6 +18,6 @@ class UploadPostImage
 
         // Upload new image
         $post->addMedia($image)
-            ->toMediaCollection('images');
+            ->toMediaCollection('images', 'public_images');
     }
 }
