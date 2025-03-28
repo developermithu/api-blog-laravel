@@ -63,10 +63,3 @@ jobs:
             cd ${{ secrets.SSH_PATH }}
             php artisan migrate --force
             php artisan optimize:clear
-            php artisan storage:link
-
-      # 8. Set Permissions on Directories
-      - name: Set Permissions on Directories
-        run: |
-          chmod -R 775 storage bootstrap/cache
-          chmod -R 775 storage/logs
